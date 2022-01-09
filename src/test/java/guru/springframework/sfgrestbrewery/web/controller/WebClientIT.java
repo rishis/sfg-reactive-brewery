@@ -1,5 +1,6 @@
 package guru.springframework.sfgrestbrewery.web.controller;
 
+import guru.springframework.sfgrestbrewery.bootstrap.BeerLoader;
 import guru.springframework.sfgrestbrewery.web.model.BeerDto;
 import guru.springframework.sfgrestbrewery.web.model.BeerPagedList;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,6 +73,28 @@ public class WebClientIT {
         });
         countDownLatch.await(1000, TimeUnit.MILLISECONDS);
 
+
+    }
+
+
+    @Test
+    void getBeerByUPC() throws InterruptedException {
+        String upc = BeerLoader.BEER_1_UPC;
+
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        Mono<BeerDto> beerDtoMono = webClient.get().uri("/api/v1/beerUpc/"+upc)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve().bodyToMono(BeerDto.class);
+
+        beerDtoMono.subscribe(beerDto -> {
+            assertThat(beerDto).isNotNull();
+            assertThat(beerDto.getBeerName()).isNotNull();
+            countDownLatch.countDown();
+
+        });
+        countDownLatch.await(1000, TimeUnit.MILLISECONDS);
+        assertThat(countDownLatch.getCount()).isEqualTo(0);
 
     }
 }
