@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by jt on 2019-04-20.
@@ -68,13 +69,16 @@ public class BeerController {
     }
 
     @PostMapping(path = "beer")
-    public ResponseEntity<Void> saveNewBeer(@RequestBody @Validated BeerDto beerDto){
+    public ResponseEntity<Void> saveNewBeer(@RequestBody @Validated Mono<BeerDto> beerDto){
+        AtomicInteger id = new AtomicInteger();
+        beerService.saveNewBeer(beerDto).subscribe(beerDto1 -> {
+            id.set(beerDto1.getId());
+        });
 
-        BeerDto savedBeer = beerService.saveNewBeer(beerDto);
 
         return ResponseEntity
                 .created(UriComponentsBuilder
-                        .fromHttpUrl("http://api.springframework.guru/api/v1/beer/" + savedBeer.getId().toString())
+                        .fromHttpUrl("http://api.springframework.guru/api/v1/beer/" + id.get())
                         .build().toUri())
                 .build();
     }

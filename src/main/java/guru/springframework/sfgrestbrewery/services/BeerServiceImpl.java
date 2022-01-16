@@ -87,9 +87,10 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public BeerDto saveNewBeer(BeerDto beerDto) {
-       // return beerMapper.beerToBeerDto(beerRepository.save(beerMapper.beerDtoToBeer(beerDto)));
-        return null;
+    public Mono<BeerDto> saveNewBeer(Mono<BeerDto> beerDto) {
+       return beerDto.map(beerMapper::beerDtoToBeer)
+               .flatMap(beerRepository::save)
+               .map(beerMapper::beerToBeerDto);
     }
 
     @Override
@@ -112,7 +113,8 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public void deleteBeerById(Integer beerId) {
-        beerRepository.deleteById(beerId);
-    }
+    public Mono<Void> deleteBeerById(Integer beerId) {
+        System.out.println("Inside delete beer service method");
+        return beerRepository.deleteById(beerId);
+        }
 }

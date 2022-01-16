@@ -16,11 +16,11 @@ public interface BeerService {
 
     Mono<BeerDto> getById(Integer beerId, Boolean showInventoryOnHand);
 
-    BeerDto saveNewBeer(BeerDto beerDto);
+    Mono<BeerDto> saveNewBeer(Mono<BeerDto> beerDto);
 
     BeerDto updateBeer(UUID beerId, BeerDto beerDto);
 
     Mono<BeerDto> getByUpc(String upc);
 
-    void deleteBeerById(Integer beerId);
+    Mono<Void> deleteBeerById(Integer beerId);
 }
